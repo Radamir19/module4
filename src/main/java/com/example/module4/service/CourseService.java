@@ -31,14 +31,13 @@ public class CourseService {
     public CourseDto createCourse(CourseDto dto) {
         Teacher teacher = teacherRepository.findById(dto.teacherId())
                 .orElseThrow(() -> new NotFoundException("Учитель с таким id не найден."));
-        if (courseRepository.existsById(dto.teacherId())) {
+        if (courseRepository.existsByTeacherId(dto.teacherId())) {
             throw new ValidateException("Преподаватель уже ведёт другой курс.");
         }
         Course course = new Course();
         course.setCourseName(dto.courseName());
         course.setDescription(dto.description());
         course.setTeacher(teacher);
-        teacher.setCourse(course);
         Course created = courseRepository.save(course);
         return courseMapper.toDto(created);
     }

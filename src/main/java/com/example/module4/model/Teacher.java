@@ -24,10 +24,6 @@ public class Teacher {
     @Column(name = "teacher_surname", nullable = false)
     private String surname;
 
-    @OneToOne(mappedBy = "teacher", cascade = CascadeType.REMOVE)
-    @MapsId
-    private Course course;
-
     @Override
     public boolean equals(Object other) {
         if(!(other instanceof Teacher)) {

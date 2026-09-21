@@ -3,6 +3,7 @@ package com.example.module4.service;
 import com.example.module4.exception.NotFoundException;
 import com.example.module4.model.Teacher;
 import com.example.module4.model.dto.TeacherDto;
+import com.example.module4.repository.CourseRepository;
 import com.example.module4.repository.TeacherRepository;
 import com.example.module4.service.mapper.TeacherMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TeacherService {
     private final TeacherRepository teacherRepository;
     private final TeacherMapper teacherMapper;
+    private final CourseRepository courseRepository;
 
     public Page<TeacherDto> getAll(Pageable pageable) {
         return teacherRepository.findAll(pageable).map(teacherMapper::toDto);
@@ -47,7 +49,9 @@ public class TeacherService {
 
     @Transactional
     public void deleteTeacher(Long id) {
-        teacherRepository.delete(teacherRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Учитель с таким id не найден.")));
+        Teacher teacher = teacherRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Учитель с таким id не найден."));
+        courseRepository.findByTeacherId(id).ifPresent(courseRepository::delete);
+        teacherRepository.delete(teacher);
     }
 }

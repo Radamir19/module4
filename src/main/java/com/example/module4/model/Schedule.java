@@ -23,7 +23,7 @@ public class Schedule {
     private Course course;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "class_id")
+    @JoinColumn(name = "group_id")
     private Group group;
 
     @Column(name = "date_start")
