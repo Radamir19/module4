@@ -1,4 +1,7 @@
 package com.example.module4.model.dto;
 
-public record TeacherDto (Long id, String name, String surname){
+import io.swagger.v3.oas.annotations.media.Schema;
+
+public record TeacherDto (@Schema(accessMode = Schema.AccessMode.READ_ONLY) Long id,
+                          String name, String surname){
 }
