@@ -4,6 +4,7 @@ import com.example.module4.model.dto.TeacherDto;
 import com.example.module4.service.TeacherService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,13 +15,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/teachers")
+@RequiredArgsConstructor
 @Tag(name = "Teacher", description = "Управление учителями")
 public class TeacherController {
     private final TeacherService teacherService;
-
-    public TeacherController(TeacherService teacherService) {
-        this.teacherService = teacherService;
-    }
 
     @GetMapping
     @Operation(summary = "Поиск всех учителей")

@@ -1,5 +1,7 @@
 package com.example.module4.model.dto;
 
 
-public record GroupDto(Long id, String name) {
+import java.util.Set;
+
+public record GroupDto(Long id, String name, Set<Long> studentIds) {
 }

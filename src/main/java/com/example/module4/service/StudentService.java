@@ -8,6 +8,7 @@ import com.example.module4.model.dto.StudentDto;
 import com.example.module4.repository.GroupRepository;
 import com.example.module4.repository.StudentRepository;
 import com.example.module4.service.mapper.StudentMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,21 +16,24 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class StudentService {
     private final StudentRepository studentRepository;
     private final GroupRepository groupRepository;
     private final StudentMapper studentMapper;
 
-    public StudentService(StudentRepository studentRepository, StudentMapper studentMapper, GroupRepository groupRepository) {
-        this.studentRepository = studentRepository;
-        this.studentMapper = studentMapper;
-        this.groupRepository = groupRepository;
-    }
-
+    @Transactional(readOnly = true)
     public Page<StudentDto> getAll(Pageable pageable) {
-        return studentRepository.findAll(pageable).map(studentMapper::toDto);
+        Page<Long> ids = studentRepository.findPageOfIds(pageable);
+        Map<Long, Student> byId = studentRepository.findAllWithGroupsByIdIn(ids.getContent())
+                .stream()
+                .collect(Collectors.toMap(Student::getId, Function.identity()));
+        return ids.map(id -> studentMapper.toDto(byId.get(id)));
     }
 
     public StudentDto getStudent(Long id) {
@@ -39,11 +43,10 @@ public class StudentService {
 
     @Transactional
     public StudentDto createStudent(StudentDto dto) {
-        List<Group> groups = groupRepository.findAllById(dto.groupIds());
-
         if(dto.groupIds().isEmpty()) {
             throw new ValidateException("Группы не найдены");
         }
+        List<Group> groups = groupRepository.findAllById(dto.groupIds());
         if(groups.size() != dto.groupIds().size()) {
             throw new NotFoundException("Одна или несколько групп не найдены.");
         }
@@ -84,7 +87,7 @@ public class StudentService {
         if(!student.getGroups().contains(group)) {
             throw new ValidateException("Студент не учится в группе с таким id");
         }else if(student.getGroups().size() == 1) {
-            studentRepository.delete(student);
+            throw new ValidateException("Студент должен находиться хотя бы в одной группе");
         }else {
             student.getGroups().remove(group);
         }

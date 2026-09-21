@@ -5,12 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "class")
+@Table(name = "group")
 @NoArgsConstructor
 public class Group {
 
@@ -18,13 +19,26 @@ public class Group {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "class_name")
+    @Column(name = "group_name", unique = true, nullable = false)
     private String groupName;
 
     @ManyToMany(mappedBy = "groups")
     private Set<Student> students;
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.REMOVE)
-    private Set<Schedule> schedule;
+    private Set<Schedule> schedule = new HashSet<>();
 
+    @Override
+    public boolean equals(Object other) {
+        if(!(other instanceof Group)) {
+            return false;
+        }
+        Group group = (Group) other;
+        return (group.id == id && group.groupName == groupName);
+    }
+
+    @Override
+    public int hashCode() {
+        return groupName.hashCode();
+    }
 }

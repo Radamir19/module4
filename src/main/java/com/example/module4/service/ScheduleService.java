@@ -6,6 +6,7 @@ import com.example.module4.model.*;
 import com.example.module4.model.dto.ScheduleDto;
 import com.example.module4.repository.*;
 import com.example.module4.service.mapper.ScheduleMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 @Service
+@RequiredArgsConstructor
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final ScheduleMapper scheduleMapper;
@@ -21,13 +23,6 @@ public class ScheduleService {
     private final CourseRepository courseRepository;
     private final TeacherRepository teacherRepository;
 
-    public ScheduleService(ScheduleRepository scheduleRepository, ScheduleMapper scheduleMapper, GroupRepository groupRepository, CourseRepository courseRepository, TeacherRepository teacherRepository) {
-        this.scheduleRepository = scheduleRepository;
-        this.scheduleMapper = scheduleMapper;
-        this.groupRepository = groupRepository;
-        this.courseRepository = courseRepository;
-        this.teacherRepository = teacherRepository;
-    }
 
     public Page<ScheduleDto> getAll(Pageable pageable) {
         return scheduleRepository.findAll(pageable).map(scheduleMapper::toDto);
@@ -43,7 +38,7 @@ public class ScheduleService {
     public ScheduleDto updateSchedule(Long scheduleId, ScheduleDto dto) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new NotFoundException("Занятие с таким id не найдено."));
-        scheduleHelper(schedule.getGroup().getId(), schedule.getTeacher().getId(), dto.dateStart(), dto.dateEnd(), schedule.getId());
+        scheduleHelper(schedule.getGroup().getId(), schedule.getCourse().getTeacher().getId(), dto.dateStart(), dto.dateEnd(), schedule.getId());
         schedule.setDateStart(dto.dateStart());
         schedule.setDateEnd(dto.dateEnd());
         return scheduleMapper.toDto(schedule);
@@ -61,17 +56,16 @@ public class ScheduleService {
         schedule.setDateStart(dto.dateStart());
         schedule.setDateEnd(dto.dateEnd());
         schedule.setCourse(course);
-        schedule.setTeacher(teacher);
         schedule.setGroup(group);
-        scheduleRepository.save(schedule);
-        return scheduleMapper.toDto(schedule);
+        Schedule created = scheduleRepository.save(schedule);
+        return scheduleMapper.toDto(created);
     }
 
     public Page<ScheduleDto> getScheduleForTeacher(Long teacherId, Pageable pageable) {
         if(!teacherRepository.existsById(teacherId)) {
             throw new NotFoundException("Учителя с таким id не существует.");
         }
-        return scheduleRepository.findAllByTeacherId(teacherId, pageable)
+        return scheduleRepository.findAllByCourseTeacherId(teacherId, pageable)
                 .map(scheduleMapper::toDto);
     }
 
@@ -85,9 +79,10 @@ public class ScheduleService {
 
     @Transactional
     public void deleteSchedule(Long scheduleId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new NotFoundException("Занятие с таким id не найдено."));
-        scheduleRepository.delete(schedule);
+        if(!(scheduleRepository.existsById(scheduleId))) {
+            throw new NotFoundException("Занятие с таким id не найдено.");
+        }
+        scheduleRepository.deleteById(scheduleId);
     }
 
     private void scheduleHelper(Long groupId, Long teacherId, LocalDateTime dateStart, LocalDateTime dateEnd, Long id) {

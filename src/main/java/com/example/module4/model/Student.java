@@ -1,10 +1,12 @@
 package com.example.module4.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -24,15 +26,26 @@ public class Student {
     @Column(name = "student_surname")
     private String surname;
 
+    @NotEmpty
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "class_student",
             joinColumns = @JoinColumn(name = "student_id"),
             inverseJoinColumns = @JoinColumn(name = "class_id")
     )
-    private Set<Group> groups;
+    private Set<Group> groups = new HashSet<>();
 
-    public Set<Group> getGroups() {
-        return groups;
+    @Override
+    public boolean equals(Object other) {
+        if(!(other instanceof Student)) {
+            return false;
+        }
+        Student s = (Student) other;
+        return (s.id == id && s.name == name && s.surname == surname);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
     }
 }

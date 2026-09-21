@@ -11,12 +11,18 @@ import com.example.module4.repository.ScheduleRepository;
 import com.example.module4.repository.StudentRepository;
 import com.example.module4.service.mapper.GroupMapper;
 import com.example.module4.service.mapper.ScheduleMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 @Service
+@RequiredArgsConstructor
 public class GroupService {
     private final GroupRepository groupRepository;
     private final StudentRepository studentRepository;
@@ -24,16 +30,12 @@ public class GroupService {
     private final ScheduleRepository scheduleRepository;
     private final ScheduleMapper scheduleMapper;
 
-    public GroupService(GroupRepository groupRepository, GroupMapper groupMapper, StudentRepository studentRepository, ScheduleRepository scheduleRepository, ScheduleMapper scheduleMapper) {
-        this.groupRepository = groupRepository;
-        this.groupMapper = groupMapper;
-        this.studentRepository = studentRepository;
-        this.scheduleRepository = scheduleRepository;
-        this.scheduleMapper = scheduleMapper;
-    }
-
     public Page<GroupDto> getAll(Pageable pageable) {
-        return groupRepository.findAll(pageable).map(groupMapper::toDto);
+        Page<Long> ids = groupRepository.findPageOfIds(pageable);
+        Map<Long, Group> byId = groupRepository.findAllWithStudentsByIdIn(ids.getContent())
+                .stream()
+                .collect(Collectors.toMap(Group::getId, Function.identity()));
+        return ids.map(id -> groupMapper.toDto(byId.get(id)));
     }
 
     public GroupDto getGroup(Long groupId) {

@@ -2,6 +2,9 @@ package com.example.module4.controller;
 
 import com.example.module4.model.dto.GroupDto;
 import com.example.module4.service.GroupService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,14 +15,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/groups")
+@RequiredArgsConstructor
+@Tag(name = "Group", description = "Управление группами")
 public class GroupController {
     private final GroupService groupService;
 
-    public GroupController(GroupService groupService) {
-        this.groupService = groupService;
-    }
-
     @GetMapping
+    @Operation(summary = "Поиск всех групп")
     public ResponseEntity<Page<GroupDto>> findAllGroups(@RequestParam(defaultValue = "0") int page,
                                                         @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("groupName").ascending());
@@ -27,21 +29,25 @@ public class GroupController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Поиск группы")
     public ResponseEntity<GroupDto> findGroup(@PathVariable("id") Long id) {
         return ResponseEntity.ok(groupService.getGroup(id));
     }
 
     @PostMapping()
+    @Operation(summary = "Создание группы")
     public ResponseEntity<GroupDto> createGroup(@RequestBody GroupDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(groupService.createGroup(dto));
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Изменение группы")
     public ResponseEntity<GroupDto> updateGroup(@PathVariable("id") Long id, @RequestBody GroupDto dto) {
         return ResponseEntity.ok(groupService.updateGroup(id, dto));
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Удаление группы")
     public ResponseEntity<Void> deleteGroup(@PathVariable("id") Long id) {
         groupService.deleteGroup(id);
         return ResponseEntity.noContent().build();

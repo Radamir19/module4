@@ -4,6 +4,7 @@ import com.example.module4.model.dto.ScheduleDto;
 import com.example.module4.service.ScheduleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,13 +15,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/schedules")
+@RequiredArgsConstructor
 @Tag(name = "Schedule", description = "Управление занятиями")
 public class ScheduleController {
     private final ScheduleService scheduleService;
-
-    public ScheduleController(ScheduleService scheduleService) {
-        this.scheduleService = scheduleService;
-    }
 
     @GetMapping
     @Operation(summary = "Поиск всех занятий")
@@ -55,21 +53,21 @@ public class ScheduleController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/teachers/{id}")
+    @GetMapping(params = "teacherId")
     @Operation(summary = "График занятий для учителя")
-    public ResponseEntity<Page<ScheduleDto>> getScheduleForTeacher(@PathVariable("id") Long id,
+    public ResponseEntity<Page<ScheduleDto>> getScheduleForTeacher(@RequestParam Long teacherId,
                                                                    @RequestParam(defaultValue = "0") int page,
                                                                    @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("dateStart").ascending());
-        return ResponseEntity.ok(scheduleService.getScheduleForTeacher(id, pageable));
+        return ResponseEntity.ok(scheduleService.getScheduleForTeacher(teacherId, pageable));
     }
 
-    @GetMapping("/groups/{id}")
+    @GetMapping(params = "groupId")
     @Operation(summary = "График занятий для группы")
-    public ResponseEntity<Page<ScheduleDto>> getScheduleForGroup(@PathVariable("id") Long id,
+    public ResponseEntity<Page<ScheduleDto>> getScheduleForGroup(@RequestParam Long groupId,
                                                                    @RequestParam(defaultValue = "0") int page,
                                                                    @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("dateStart").ascending());
-        return ResponseEntity.ok(scheduleService.getScheduleForGroup(id, pageable));
+        return ResponseEntity.ok(scheduleService.getScheduleForGroup(groupId, pageable));
     }
 }

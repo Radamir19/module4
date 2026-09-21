@@ -3,12 +3,15 @@ package com.example.module4.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @NoArgsConstructor
 @Getter
+@Setter
 public class Course {
 
     @Id
@@ -26,22 +29,20 @@ public class Course {
     private Teacher teacher;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.REMOVE)
-    private Set<Schedule> schedule;
+    private Set<Schedule> schedule = new HashSet<>();
 
-
-    public void setDescription(String description) {
-        this.description = description;
+    @Override
+    public boolean equals(Object other) {
+        if(!(other instanceof Course)) {
+            return false;
+        }
+        Course course = (Course) other;
+        return (course.id == id && course.courseName == courseName
+                && course.description == description);
     }
 
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
-    }
-
-    public void setTeacher(Teacher teacher) {
-        this.teacher = teacher;
-    }
-
-    public void setSchedule(Set<Schedule> schedule) {
-        this.schedule = schedule;
+    @Override
+    public int hashCode() {
+        return description.hashCode();
     }
 }

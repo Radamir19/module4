@@ -3,6 +3,7 @@ package com.example.module4.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 @Table(name = "schedule")
 @NoArgsConstructor
 @Getter
+@Setter
 public class Schedule {
 
     @Id
@@ -24,33 +26,10 @@ public class Schedule {
     @JoinColumn(name = "class_id")
     private Group group;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "teacher_id")
-    private Teacher teacher;
-
     @Column(name = "date_start")
     private LocalDateTime dateStart;
 
     @Column(name = "date_end")
     private LocalDateTime dateEnd;
 
-    public void setDateStart(LocalDateTime dateStart) {
-        this.dateStart = dateStart;
-    }
-
-    public void setDateEnd(LocalDateTime dateEnd) {
-        this.dateEnd = dateEnd;
-    }
-
-    public void setCourse(Course course) {
-        this.course = course;
-    }
-
-    public void setGroup(Group group) {
-        this.group = group;
-    }
-
-    public void setTeacher(Teacher teacher) {
-        this.teacher = teacher;
-    }
 }

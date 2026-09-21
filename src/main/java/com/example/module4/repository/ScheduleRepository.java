@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
-    Page<Schedule> findAllByTeacherId(Long teacherId, Pageable pageable);
+    Page<Schedule> findAllByCourseTeacherId(Long teacherId, Pageable pageable);
     Page<Schedule> findAllByGroupId(Long groupId, Pageable pageable);
 
-    @Query("SELECT COUNT(s) > 0 FROM Schedule s WHERE :dateStart < s.dateEnd AND :dateEnd > s.dateStart AND (s.group.id = :groupId OR s.teacher.id = :teacherId) AND s.id <> :id")
+    @Query("SELECT COUNT(s) > 0 FROM Schedule s WHERE :dateStart < s.dateEnd AND :dateEnd > s.dateStart AND (s.group.id = :groupId OR s.course.teacher.id = :teacherId) AND (:id IS NULL OR s.id <> :id)")
     boolean existsOverlapping(@Param("groupId") Long groupId,
                               @Param("teacherId") Long teacherId,
                               @Param("dateStart") LocalDateTime dateStart,
