@@ -9,4 +9,6 @@ import org.mapstruct.Mapping;
 public interface CourseMapper {
     @Mapping(source = "teacher.id", target = "teacherId")
     CourseDto toDto(Course course);
+
+    Course toEntity(CourseDto dto);
 }

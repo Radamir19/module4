@@ -4,6 +4,9 @@ import com.example.module4.model.dto.TeacherDto;
 import com.example.module4.service.TeacherService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,33 +25,33 @@ public class TeacherController {
 
     @GetMapping
     @Operation(summary = "Поиск всех учителей")
-    public ResponseEntity<Page<TeacherDto>> findAllTeachers(@RequestParam(defaultValue = "0") int page,
-                                                            @RequestParam(defaultValue = "20") int size) {
+    public ResponseEntity<Page<TeacherDto>> findAllTeachers(@RequestParam(defaultValue = "0") @PositiveOrZero int page,
+                                                            @RequestParam(defaultValue = "20") @Positive int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("name"));
         return ResponseEntity.ok(teacherService.getAll(pageable));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Поиск учителя по id")
-    public ResponseEntity<TeacherDto> getTeacher(@PathVariable("id") Long id) {
+    public ResponseEntity<TeacherDto> getTeacher(@PathVariable("id") @Positive Long id) {
         return ResponseEntity.ok(teacherService.getTeacher(id));
     }
 
     @PostMapping
     @Operation(summary = "Создание нового учителя")
-    public ResponseEntity<TeacherDto> createTeacher(@RequestBody TeacherDto dto) {
+    public ResponseEntity<TeacherDto> createTeacher(@Valid @RequestBody TeacherDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(teacherService.createTeacher(dto));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Обновление данных об учителе")
-    public ResponseEntity<TeacherDto> updateTeacher(@PathVariable("id") Long id, @RequestBody TeacherDto dto) {
+    public ResponseEntity<TeacherDto> updateTeacher(@PathVariable("id") @Positive Long id, @Valid @RequestBody TeacherDto dto) {
         return ResponseEntity.ok(teacherService.updateTeacher(id, dto));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Удаление учителя, вместе с ним курса и расписания")
-    public ResponseEntity<Void> deleteTeacher(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteTeacher(@PathVariable("id") @Positive Long id) {
         teacherService.deleteTeacher(id);
         return ResponseEntity.noContent().build();
     }

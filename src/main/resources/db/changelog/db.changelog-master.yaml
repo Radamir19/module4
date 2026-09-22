@@ -1,3 +1,15 @@
 databaseChangeLog:
   - include:
-      file: db/changelog/001-init-schema.sql
+      file: db/changelog/001-create-teacher.sql
+  - include:
+      file: db/changelog/002-create-course.sql
+  - include:
+      file: db/changelog/003-create-groups.sql
+  - include:
+      file: db/changelog/004-create-student.sql
+  - include:
+      file: db/changelog/005-create-student-group.sql
+  - include:
+      file: db/changelog/006-create-schedule.sql
+  - include:
+      file: db/changelog/007-create-schedule-indexes.sql

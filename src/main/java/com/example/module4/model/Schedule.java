@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "schedule")
@@ -19,17 +19,17 @@ public class Schedule {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_id")
+    @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id")
+    @JoinColumn(name = "group_id", nullable = false)
     private Group group;
 
-    @Column(name = "date_start")
-    private LocalDateTime dateStart;
+    @Column(name = "date_start", nullable = false)
+    private OffsetDateTime dateStart;
 
-    @Column(name = "date_end")
-    private LocalDateTime dateEnd;
+    @Column(name = "date_end", nullable = false)
+    private OffsetDateTime dateEnd;
 
 }

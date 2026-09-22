@@ -43,9 +43,6 @@ public class StudentService {
 
     @Transactional
     public StudentDto createStudent(StudentDto dto) {
-        if(dto.groupIds().isEmpty()) {
-            throw new ValidateException("Группы не найдены");
-        }
         List<Group> groups = groupRepository.findAllById(dto.groupIds());
         if(groups.size() != dto.groupIds().size()) {
             throw new NotFoundException("Одна или несколько групп не найдены.");
@@ -80,10 +77,10 @@ public class StudentService {
 
     @Transactional
     public void removeStudentFromGroup(Long groupId, Long studentId) {
+        Student student = studentRepository.findByIdForUpdate(studentId)
+                .orElseThrow(() -> new NotFoundException("Студент не найден."));
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new NotFoundException("Группа не найдена."));
-        Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new NotFoundException("Студент не найден."));
         if(!student.getGroups().contains(group)) {
             throw new ValidateException("Студент не учится в группе с таким id");
         }else if(student.getGroups().size() == 1) {
@@ -95,7 +92,9 @@ public class StudentService {
 
     @Transactional
     public void deleteStudent(Long studentId) {
-        studentRepository.delete(studentRepository.findById(studentId)
-                .orElseThrow(() -> new NotFoundException("Студент с таким id не найден.")));
+        if(!studentRepository.existsById(studentId)) {
+            throw new NotFoundException("Студент с таким id не найден.");
+        }
+        studentRepository.deleteById(studentId);
     }
 }

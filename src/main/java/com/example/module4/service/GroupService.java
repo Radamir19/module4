@@ -62,10 +62,11 @@ public class GroupService {
 
     @Transactional
     public void deleteGroup(Long groupId) {
-        Group group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new NotFoundException("Группа с таким id не найдена."));
-        studentRepository.deleteAll(studentRepository.findStudentsOnlyInOneGroup(groupId));
-        groupRepository.delete(group);
+        if(!groupRepository.existsById(groupId)) {
+            throw new NotFoundException("Группа с таким id не найдена.");
+        }
+        studentRepository.deleteAllByIdInBatch(studentRepository.findStudentsOnlyInOneGroup(groupId));
+        groupRepository.deleteById(groupId);
     }
 
     public Page<ScheduleDto> getScheduleForGroup(Long groupId, Pageable pageable) {

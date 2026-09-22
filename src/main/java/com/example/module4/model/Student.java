@@ -5,8 +5,10 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -20,10 +22,10 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "student_name")
+    @Column(name = "student_name", nullable = false)
     private String name;
 
-    @Column(name = "student_surname")
+    @Column(name = "student_surname", nullable = false)
     private String surname;
 
     @NotEmpty
@@ -35,17 +37,20 @@ public class Student {
     )
     private Set<Group> groups = new HashSet<>();
 
-    @Override
-    public boolean equals(Object other) {
-        if(!(other instanceof Student)) {
-            return false;
-        }
-        Student s = (Student) other;
-        return (s.id == id && s.name == name && s.surname == surname);
+    @Override public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer()
+                .getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this)
+                .getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        Student that = (Student) o;
+        return getId() != null && Objects.equals(getId(), that.getId());
     }
 
-    @Override
-    public int hashCode() {
-        return name.hashCode();
+    @Override public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer()
+                .getPersistentClass().hashCode() : getClass().hashCode();
     }
 }

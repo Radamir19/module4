@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -23,22 +25,25 @@ public class Group {
     private String groupName;
 
     @ManyToMany(mappedBy = "groups")
-    private Set<Student> students;
+    private Set<Student> students = new HashSet<>();
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.REMOVE)
     private Set<Schedule> schedule = new HashSet<>();
 
-    @Override
-    public boolean equals(Object other) {
-        if(!(other instanceof Group)) {
-            return false;
-        }
-        Group group = (Group) other;
-        return (group.id == id && group.groupName == groupName);
+    @Override public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer()
+                .getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this)
+                .getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        Group that = (Group) o;
+        return getId() != null && Objects.equals(getId(), that.getId());
     }
 
-    @Override
-    public int hashCode() {
-        return groupName.hashCode();
+    @Override public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer()
+                .getPersistentClass().hashCode() : getClass().hashCode();
     }
 }

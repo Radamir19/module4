@@ -12,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -85,7 +85,7 @@ public class ScheduleService {
         scheduleRepository.deleteById(scheduleId);
     }
 
-    private void scheduleHelper(Long groupId, Long teacherId, LocalDateTime dateStart, LocalDateTime dateEnd, Long id) {
+    private void scheduleHelper(Long groupId, Long teacherId, OffsetDateTime dateStart, OffsetDateTime dateEnd, Long id) {
         if(dateStart.isAfter(dateEnd)) {
             throw new ValidateException("Дата начала занятия не может быть позже её окончания.");
         }else if(dateStart.isEqual(dateEnd)) {

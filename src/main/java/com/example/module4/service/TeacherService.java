@@ -49,9 +49,9 @@ public class TeacherService {
 
     @Transactional
     public void deleteTeacher(Long id) {
-        Teacher teacher = teacherRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Учитель с таким id не найден."));
-        courseRepository.findByTeacherId(id).ifPresent(courseRepository::delete);
-        teacherRepository.delete(teacher);
+        if(!teacherRepository.existsById(id)) {
+            throw new NotFoundException("Учитель с таким id не найден.");
+        }
+        teacherRepository.deleteById(id);
     }
 }

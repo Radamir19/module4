@@ -34,10 +34,7 @@ public class CourseService {
         if (courseRepository.existsByTeacherId(dto.teacherId())) {
             throw new ValidateException("Преподаватель уже ведёт другой курс.");
         }
-        Course course = new Course();
-        course.setCourseName(dto.courseName());
-        course.setDescription(dto.description());
-        course.setTeacher(teacher);
+        Course course = courseMapper.toEntity(dto);
         Course created = courseRepository.save(course);
         return courseMapper.toDto(created);
     }
@@ -52,16 +49,20 @@ public class CourseService {
     public CourseDto updateCourse(Long id, CourseDto dto) {
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Курс с таким id не найден."));
+        Teacher teacher = teacherRepository.findById(dto.teacherId())
+                        .orElseThrow(() -> new NotFoundException("Учитель с таким id не найден."));
         course.setCourseName(dto.courseName());
         course.setDescription(dto.description());
+        course.setTeacher(teacher);
         return courseMapper.toDto(course);
     }
 
     @Transactional
     public void deleteCourse(Long id) {
-        Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Курс с таким id не найден."));
-        courseRepository.delete(course);
+        if(!courseRepository.existsById(id)) {
+            throw new NotFoundException("Курс с таким id не найден.");
+        }
+        courseRepository.deleteById(id);
     }
 
 }

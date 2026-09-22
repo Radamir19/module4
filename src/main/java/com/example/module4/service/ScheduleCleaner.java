@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Component
 public class ScheduleCleaner {
@@ -18,6 +19,6 @@ public class ScheduleCleaner {
     @Scheduled(cron = "${spring.app.cleanup.cron}")
     @Transactional
     public void deleteOldSchedule() {
-        scheduleRepository.deleteSchedules(LocalDateTime.now().minusYears(1));
+        scheduleRepository.deleteSchedules(OffsetDateTime.now().minusYears(1));
     }
 }
