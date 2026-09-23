@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.util.HashSet;
@@ -27,7 +29,8 @@ public class Group {
     @ManyToMany(mappedBy = "groups")
     private Set<Student> students = new HashSet<>();
 
-    @OneToMany(mappedBy = "group", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "group")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Schedule> schedule = new HashSet<>();
 
     @Override public final boolean equals(Object o) {

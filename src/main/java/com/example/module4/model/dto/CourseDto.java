@@ -5,5 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-public record CourseDto(@Schema(accessMode = Schema.AccessMode.READ_ONLY) Long id, @NotBlank String courseName, String description, @NotNull @Positive Long teacherId){
+public record CourseDto(@Schema(accessMode = Schema.AccessMode.READ_ONLY) Long id,
+                        @NotBlank String courseName,
+                        String description,
+                        @NotNull @Positive Long teacherId){
 }

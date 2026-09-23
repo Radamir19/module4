@@ -1,6 +1,7 @@
 package com.example.module4.controller;
 
 import com.example.module4.model.dto.StudentDto;
+import com.example.module4.model.dto.UpdateStudentDto;
 import com.example.module4.service.StudentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,12 +15,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/students")
 @RequiredArgsConstructor
 @Tag(name = "Student", description = "Управление студентом")
+@Validated
 public class StudentController {
     private final StudentService studentService;
 
@@ -45,7 +48,7 @@ public class StudentController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Изменение студента")
-    public ResponseEntity<StudentDto> updateStudent(@PathVariable("id") @Positive Long id, @Valid @RequestBody StudentDto dto) {
+    public ResponseEntity<StudentDto> updateStudent(@PathVariable("id") @Positive Long id, @Valid @RequestBody UpdateStudentDto dto) {
         return ResponseEntity.ok(studentService.updateStudent(id, dto));
     }
 

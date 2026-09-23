@@ -26,6 +26,9 @@ public class Teacher {
     @Column(name = "teacher_surname", nullable = false)
     private String surname;
 
+    @OneToOne(mappedBy = "teacher", fetch = FetchType.LAZY)
+    private Course course;
+
     @Override public final boolean equals(Object o) {
         if (this == o) return true;
         if (o == null) return false;

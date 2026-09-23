@@ -5,6 +5,7 @@ import com.example.module4.exception.ValidateException;
 import com.example.module4.model.Group;
 import com.example.module4.model.Student;
 import com.example.module4.model.dto.StudentDto;
+import com.example.module4.model.dto.UpdateStudentDto;
 import com.example.module4.repository.GroupRepository;
 import com.example.module4.repository.StudentRepository;
 import com.example.module4.service.mapper.StudentMapper;
@@ -30,6 +31,9 @@ public class StudentService {
     @Transactional(readOnly = true)
     public Page<StudentDto> getAll(Pageable pageable) {
         Page<Long> ids = studentRepository.findPageOfIds(pageable);
+        if(ids.isEmpty()) {
+            return Page.empty(pageable);
+        }
         Map<Long, Student> byId = studentRepository.findAllWithGroupsByIdIn(ids.getContent())
                 .stream()
                 .collect(Collectors.toMap(Student::getId, Function.identity()));
@@ -48,16 +52,14 @@ public class StudentService {
             throw new NotFoundException("Одна или несколько групп не найдены.");
         }
 
-        Student student = new Student();
-        student.setName(dto.name());
-        student.setSurname(dto.surname());
+        Student student = studentMapper.toEntity(dto);
         student.setGroups(new HashSet<>(groups));
         studentRepository.save(student);
         return studentMapper.toDto(student);
     }
 
     @Transactional
-    public StudentDto updateStudent(Long id, StudentDto dto) {
+    public StudentDto updateStudent(Long id, UpdateStudentDto dto) {
         Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Студент не найден"));
         student.setName(dto.name());

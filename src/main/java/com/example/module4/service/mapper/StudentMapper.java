@@ -6,12 +6,18 @@ import com.example.module4.model.dto.StudentDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Mapper(componentModel = "spring")
 public interface StudentMapper {
     @Mapping(source = "groups", target = "groupIds")
     StudentDto toDto(Student student);
 
-    default Long groupToId(Group group) {
-        return group.getId();
+    default Set<Long> groupToId(Set<Group> groups) {
+        return groups == null ? Set.of() : groups.stream().map(Group::getId).collect(Collectors.toSet());
     }
+
+    @Mapping(target = "groups", ignore = true)
+    Student toEntity(StudentDto dto);
 }

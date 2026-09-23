@@ -3,7 +3,6 @@ package com.example.module4.service;
 import com.example.module4.exception.NotFoundException;
 import com.example.module4.model.Teacher;
 import com.example.module4.model.dto.TeacherDto;
-import com.example.module4.repository.CourseRepository;
 import com.example.module4.repository.TeacherRepository;
 import com.example.module4.service.mapper.TeacherMapper;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class TeacherService {
     private final TeacherRepository teacherRepository;
     private final TeacherMapper teacherMapper;
-    private final CourseRepository courseRepository;
 
     public Page<TeacherDto> getAll(Pageable pageable) {
         return teacherRepository.findAll(pageable).map(teacherMapper::toDto);
@@ -25,10 +23,7 @@ public class TeacherService {
 
     @Transactional
     public TeacherDto createTeacher(TeacherDto dto) {
-        Teacher teacher = new Teacher();
-        teacher.setName(dto.name());
-        teacher.setSurname(dto.surname());
-        teacherRepository.save(teacher);
+        Teacher teacher = teacherMapper.toEntity(dto);
         return teacherMapper.toDto(teacher);
     }
 

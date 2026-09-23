@@ -14,12 +14,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/groups")
 @RequiredArgsConstructor
 @Tag(name = "Group", description = "Управление группами")
+@Validated
 public class GroupController {
     private final GroupService groupService;
 

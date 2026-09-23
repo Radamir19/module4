@@ -38,7 +38,15 @@ public class ScheduleService {
     public ScheduleDto updateSchedule(Long scheduleId, ScheduleDto dto) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new NotFoundException("Занятие с таким id не найдено."));
+        Course course = courseRepository.findById(dto.courseId())
+                .orElseThrow(() -> new NotFoundException("Курс с таким id не найден."));
+        Teacher teacher = teacherRepository.findLockedById(course.getTeacher().getId())
+                .orElseThrow(() -> new NotFoundException("Учитель не найден."));
+        Group group = groupRepository.findLockedById(dto.groupId())
+                .orElseThrow(() -> new NotFoundException("Группа с таким id не найдена"));
         scheduleHelper(schedule.getGroup().getId(), schedule.getCourse().getTeacher().getId(), dto.dateStart(), dto.dateEnd(), schedule.getId());
+        schedule.setGroup(group);
+        schedule.setCourse(course);
         schedule.setDateStart(dto.dateStart());
         schedule.setDateEnd(dto.dateEnd());
         return scheduleMapper.toDto(schedule);
@@ -49,8 +57,9 @@ public class ScheduleService {
         Schedule schedule = new Schedule();
         Course course = courseRepository.findById(dto.courseId())
                 .orElseThrow(() -> new NotFoundException("Курс с таким id не найден."));
-        Teacher teacher = course.getTeacher();
-        Group group = groupRepository.findById(dto.groupId())
+        Teacher teacher = teacherRepository.findLockedById(course.getTeacher().getId())
+                .orElseThrow(() -> new NotFoundException("Учитель не найден."));
+        Group group = groupRepository.findLockedById(dto.groupId())
                 .orElseThrow(() -> new NotFoundException("Группа с таким id не найдена"));
         scheduleHelper(dto.groupId(), teacher.getId(), dto.dateStart(), dto.dateEnd(), -1L);
         schedule.setDateStart(dto.dateStart());

@@ -32,6 +32,9 @@ public class GroupService {
 
     public Page<GroupDto> getAll(Pageable pageable) {
         Page<Long> ids = groupRepository.findPageOfIds(pageable);
+        if(ids.isEmpty()) {
+            return Page.empty(pageable);
+        }
         Map<Long, Group> byId = groupRepository.findAllWithStudentsByIdIn(ids.getContent())
                 .stream()
                 .collect(Collectors.toMap(Group::getId, Function.identity()));
