@@ -52,7 +52,7 @@ public class CourseService {
                 .orElseThrow(() -> new NotFoundException("Учитель с таким id не найден."));
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Курс с таким id не найден."));
-        if (courseRepository.existsByTeacherIdAndIdNot(teacher.getId(), id)) {
+        if (teacher.getCourse() != null) {
             throw new ValidateException("Учитель с таким id уже ведёт курс.");
         }
         course.setCourseName(dto.courseName());

@@ -16,8 +16,5 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     Page<Course> findAll(Pageable pageable);
 
     boolean existsByTeacherId(Long teacherId);
-    Optional<Course> findByTeacherId(Long teacherId);
-
-    boolean existsByTeacherIdAndIdNot(Long teacherId, Long id);
 
 }
