@@ -22,19 +22,20 @@ public class CourseService {
     private final CourseMapper courseMapper;
 
     public Page<CourseDto> getAll(Pageable pageable) {
-        Page<CourseDto> courses = courseRepository.findAllWithTeachers(pageable)
+        Page<CourseDto> courses = courseRepository.findAll(pageable)
                 .map(courseMapper::toDto);
         return courses;
     }
 
     @Transactional
     public CourseDto createCourse(CourseDto dto) {
-        Teacher teacher = teacherRepository.findById(dto.teacherId())
+        Teacher teacher = teacherRepository.findLockedById(dto.teacherId())
                 .orElseThrow(() -> new NotFoundException("Учитель с таким id не найден."));
         if (courseRepository.existsByTeacherId(dto.teacherId())) {
             throw new ValidateException("Преподаватель уже ведёт другой курс.");
         }
         Course course = courseMapper.toEntity(dto);
+        course.setTeacher(teacher);
         Course created = courseRepository.save(course);
         return courseMapper.toDto(created);
     }
@@ -47,10 +48,13 @@ public class CourseService {
 
     @Transactional
     public CourseDto updateCourse(Long id, CourseDto dto) {
+        Teacher teacher = teacherRepository.findLockedById(dto.teacherId())
+                .orElseThrow(() -> new NotFoundException("Учитель с таким id не найден."));
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Курс с таким id не найден."));
-        Teacher teacher = teacherRepository.findById(dto.teacherId())
-                        .orElseThrow(() -> new NotFoundException("Учитель с таким id не найден."));
+        if (courseRepository.existsByTeacherIdAndIdNot(teacher.getId(), id)) {
+            throw new ValidateException("Учитель с таким id уже ведёт курс.");
+        }
         course.setCourseName(dto.courseName());
         course.setDescription(dto.description());
         course.setTeacher(teacher);

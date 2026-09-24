@@ -10,10 +10,14 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface CourseRepository extends JpaRepository<Course, Long> {
+
+    @Override
     @EntityGraph(attributePaths = {"teacher"})
-    Page<Course> findAllWithTeachers(Pageable pageable);
+    Page<Course> findAll(Pageable pageable);
 
     boolean existsByTeacherId(Long teacherId);
     Optional<Course> findByTeacherId(Long teacherId);
+
+    boolean existsByTeacherIdAndIdNot(Long teacherId, Long id);
 
 }

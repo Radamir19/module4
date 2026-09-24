@@ -6,6 +6,7 @@ import com.example.module4.model.dto.StudentDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,7 +16,8 @@ public interface StudentMapper {
     StudentDto toDto(Student student);
 
     default Set<Long> groupToId(Set<Group> groups) {
-        return groups == null ? Set.of() : groups.stream().map(Group::getId).collect(Collectors.toSet());
+        return groups == null ? Set.of() :
+                groups.stream().map(Group::getId).filter(Objects::isNull).collect(Collectors.toSet());
     }
 
     @Mapping(target = "groups", ignore = true)

@@ -1,3 +1,4 @@
 databaseChangeLog:
   - includeAll:
       path: db/changelog/changes
+      resourceComparator: com.example.module4.config.NumberComparator
