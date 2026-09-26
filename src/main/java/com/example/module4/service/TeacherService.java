@@ -24,6 +24,7 @@ public class TeacherService {
     @Transactional
     public TeacherDto createTeacher(TeacherDto dto) {
         Teacher teacher = teacherMapper.toEntity(dto);
+        teacherRepository.save(teacher);
         return teacherMapper.toDto(teacher);
     }
 

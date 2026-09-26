@@ -9,14 +9,14 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-    liquibase:
-      changelog: classpath:db/changelog/db.changelog-master.yaml
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
+  liquibase:
+    enabled: true
+    changelog: classpath:db/changelog/db.changelog-master.yaml
 
   app:
     cleanup:
