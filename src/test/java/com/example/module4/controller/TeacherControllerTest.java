@@ -1,6 +1,7 @@
 package com.example.module4.controller;
 
 
+import com.example.module4.config.AbstractIntegrationTest;
 import com.example.module4.exception.NotFoundException;
 import com.example.module4.model.Teacher;
 import com.example.module4.model.dto.TeacherDto;
@@ -18,29 +19,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
-public class TeacherControllerTest {
-
-    @Container
-    static PostgreSQLContainer<?> postgres =
-            new PostgreSQLContainer<>("postgres:17")
-                    .withDatabaseName("lms")
-                    .withUsername("postgres")
-                    .withPassword("postgres");
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-    }
+public class TeacherControllerTest extends AbstractIntegrationTest {
 
     @Autowired
     private TeacherRepository teacherRepository;
@@ -168,6 +151,28 @@ public class TeacherControllerTest {
     }
 
     @Test
+    void deleteTeacher_returns404WhenTeacherIdNotFound() {
+        ResponseEntity<Void> response = template.exchange(
+                "/api/v1/teachers/9999",
+                HttpMethod.DELETE,
+                null,
+                Void.class
+        );
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void deleteTeacher_returns500WhenTeacherIdIsNegative() {
+        ResponseEntity<Void> response = template.exchange(
+                "/api/v1/teachers/-1",
+                HttpMethod.DELETE,
+                null,
+                Void.class
+        );
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
+
+    @Test
     void shouldGetAllTeachersWithPagination() throws JsonProcessingException {
         Teacher teacher1 = new Teacher();
         teacher1.setName("Ivan");
@@ -197,5 +202,15 @@ public class TeacherControllerTest {
         Assertions.assertEquals(2, json.get("size").asInt());
     }
 
+    @Test
+    void getAll_returns500WhenPaginationIsIncorrect() {
+        ResponseEntity<String> response = template.exchange(
+                "/api/v1/teachers?page=-1&size=2",
+                HttpMethod.GET,
+                null,
+                String.class
+        );
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
 
 }

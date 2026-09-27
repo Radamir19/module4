@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/teachers")
 @RequiredArgsConstructor
 @Tag(name = "Teacher", description = "Управление учителями")
-@Validated
 public class TeacherController {
     private final TeacherService teacherService;
 
