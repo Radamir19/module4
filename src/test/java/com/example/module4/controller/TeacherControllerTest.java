@@ -169,7 +169,7 @@ public class TeacherControllerTest extends AbstractIntegrationTest {
                 null,
                 Void.class
         );
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     @Test
@@ -210,7 +210,7 @@ public class TeacherControllerTest extends AbstractIntegrationTest {
                 null,
                 String.class
         );
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
 }
