@@ -162,7 +162,7 @@ public class TeacherControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void deleteTeacher_returns500WhenTeacherIdIsNegative() {
+    void deleteTeacher_returns400WhenTeacherIdIsNegative() {
         ResponseEntity<Void> response = template.exchange(
                 "/api/v1/teachers/-1",
                 HttpMethod.DELETE,
@@ -203,13 +203,14 @@ public class TeacherControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void getAll_returns500WhenPaginationIsIncorrect() {
+    void getAll_returns400WhenPaginationIsIncorrect() {
         ResponseEntity<String> response = template.exchange(
                 "/api/v1/teachers?page=-1&size=2",
                 HttpMethod.GET,
                 null,
                 String.class
         );
+
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 

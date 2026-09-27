@@ -3,6 +3,7 @@ package com.example.module4.controller;
 import com.example.module4.exception.ErrorResponse;
 import com.example.module4.exception.NotFoundException;
 import com.example.module4.exception.ValidateException;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,5 +27,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleConflict(DataIntegrityViolationException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new ErrorResponse("Операция нарушает ограничения данных."));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<String> handleConstraintViolation(
+            ConstraintViolationException ex) {
+
+        return ResponseEntity
+                .badRequest()
+                .body(ex.getMessage());
     }
 }
