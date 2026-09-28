@@ -6,7 +6,6 @@ import com.example.module4.exception.NotFoundException;
 import com.example.module4.model.Teacher;
 import com.example.module4.model.dto.TeacherDto;
 import com.example.module4.repository.TeacherRepository;
-import com.example.module4.service.mapper.TeacherMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -30,8 +29,7 @@ public class TeacherControllerTest extends AbstractIntegrationTest {
     private TestRestTemplate template;
     @Autowired
     private ObjectMapper objectMapper;
-    @Autowired
-    private TeacherMapper teacherMapper;
+
 
     @AfterEach
     void tearDown() {
@@ -40,7 +38,7 @@ public class TeacherControllerTest extends AbstractIntegrationTest {
 
     @Test
     void shouldCreateNewTeacher() {
-        TeacherDto request = createOneTeacherHelper();
+        TeacherDto request = createOneTeacherDtoHelper();
 
         ResponseEntity<TeacherDto> response =
                 template.postForEntity("/api/v1/teachers", request, TeacherDto.class);
@@ -60,7 +58,7 @@ public class TeacherControllerTest extends AbstractIntegrationTest {
 
     @Test
     void createTeacher_returns400WhenNameIsBlank() {
-        TeacherDto request = createOneTeacherHelper();
+        TeacherDto request = createOneTeacherDtoHelper();
 
         ResponseEntity<String> response =
                 template.postForEntity("/api/v1/teachers", request, String.class);
@@ -71,7 +69,7 @@ public class TeacherControllerTest extends AbstractIntegrationTest {
 
     @Test
     void createTeacher_returns400WhenSurnameIsBlank() {
-        TeacherDto request = createOneTeacherHelper();
+        TeacherDto request = createOneTeacherDtoHelper();
 
         ResponseEntity<String> response =
                 template.postForEntity("/api/v1/teachers", request, String.class);
@@ -82,7 +80,7 @@ public class TeacherControllerTest extends AbstractIntegrationTest {
 
     @Test
     void shouldGetTeacher() {
-        Teacher teacher = teacherMapper.toEntity(createOneTeacherHelper());
+        Teacher teacher = createOneTeacherHelper();
         Teacher saved = teacherRepository.save(teacher);
 
         ResponseEntity<TeacherDto> response =
@@ -105,7 +103,7 @@ public class TeacherControllerTest extends AbstractIntegrationTest {
 
     @Test
     void shouldUpdateTeacher() {
-        Teacher teacher = teacherMapper.toEntity(createOneTeacherHelper());
+        Teacher teacher = createOneTeacherHelper();
         Teacher saved = teacherRepository.save(teacher);
 
         TeacherDto requestUpdate = new TeacherDto(saved.getId(), "Petr", "Ivanov");
@@ -130,7 +128,7 @@ public class TeacherControllerTest extends AbstractIntegrationTest {
 
     @Test
     void shouldDeleteTeacher() {
-        Teacher teacher = teacherMapper.toEntity(createOneTeacherHelper());
+        Teacher teacher = createOneTeacherHelper();
         Teacher saved = teacherRepository.save(teacher);
 
         ResponseEntity<Void> response = template.exchange(
@@ -169,9 +167,9 @@ public class TeacherControllerTest extends AbstractIntegrationTest {
 
     @Test
     void shouldGetAllTeachersWithPagination() throws JsonProcessingException {
-        Teacher teacher1 = teacherMapper.toEntity(createOneTeacherHelper());
+        Teacher teacher1 = createOneTeacherHelper();
         Teacher saved1 = teacherRepository.save(teacher1);
-        Teacher teacher2 = teacherMapper.toEntity(createOneTeacherHelper());
+        Teacher teacher2 = createOneTeacherHelper();
         Teacher saved2 = teacherRepository.save(teacher2);
 
         ResponseEntity<String> response = template.exchange(
@@ -205,8 +203,14 @@ public class TeacherControllerTest extends AbstractIntegrationTest {
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
-    static TeacherDto createOneTeacherHelper() {
+    static TeacherDto createOneTeacherDtoHelper() {
         return new TeacherDto(null, "Ivan", "Ivanov");
     }
 
+    static Teacher createOneTeacherHelper() {
+        Teacher teacher = new Teacher();
+        teacher.setName("Ivan");
+        teacher.setSurname("Ivanov");
+        return teacher;
+    }
 }
